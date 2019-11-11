@@ -41,40 +41,53 @@ private:
     Stack<char> operatorStack;
     
     // most recent input expression
-    std::string infixExp;
+    std::string infixExp = "";
     
     // most recent expression expressed in post-fix form
-    std::string postfixExp;
+    std::string postfixExp = "";
     
     // most recent expression in pre-fix form
-    std::string prefixExp;
+    std::string prefixExp = "";
     
     // result of evaluated expression
     int result;
     
-    void evaluate();
+    
+    
+    bool validate(const std::string& inputExpression);
+    bool isOperator(std::string op);
+    bool isParen(std::string op);
+    bool isOperand(std::string C);
+   
+    int precedence(char op);
+    int performOperation(char operation, int operand1, int operand2);
+    int higherPrecedence(char op1, char op2);
+    int evaluatePostfix(std::string postfix);
+    int evaluatePrefix(std::string postfix);
     
     
     
+    std::string infixToPostfix();
+    std::string infixToPrefix();
+
 public:
     
    
-    int calculate(const std::string& inputExpression);
-    int precedence(std:: string operators);
-    bool validate(const std::string& inputExpression);
-    bool isOperator(char op);
-    
-    //setters
-    void setInfix(std::string input);
-    
+    void calculatePost(const std::string& inputExpression);
+    void calculatePre(const std::string &inputExpression);
+ 
     //getters
     int getResult() const;
     std::string getInfix() const;
     std::string getPostfix() const;
     std::string getPrefix() const;
+    //setters
+    void setInfix(std::string input);
+    void setResult(int result);
+    void setPrefix(std::string prefix);
+    void setPostfix(std::string postfix);
     
     
-    std::string infixToPostfix();
     
 };
 #endif /* Calculator_h */
