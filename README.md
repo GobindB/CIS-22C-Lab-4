@@ -1,5 +1,5 @@
 # CIS-22C-Lab-4
-Infix expression calculator La
+Infix expression calculator
 
 1. Create a class called 'Calculator' for infix expression calculation using the two-stack method as shown in class. This calculator should address the following:
 
