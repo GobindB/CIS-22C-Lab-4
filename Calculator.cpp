@@ -1,165 +1,90 @@
-//
-//  Calculator.cpp
-//  CIS 22C Lab 4
-//
-//  Created by Gobind Bakhshi on 11/7/19.
-//  Copyright © 2019 Gobind Bakhshi. All rights reserved.
-//
-
 #include "Calculator.h"
+#include <string>
 
 
-int Calculator::calculate(const std::string &inputExpression)
+void Calculator::in2Postfix()
 {
-    if(validate(inputExpression))
-    {
-        //set infix expression to input after validation checking
-        infixExp = inputExpression;
-        
-        // clear previous result of postfix expression
-        postfixExp = "";
-        
-        
-        return result;
-    }
-    else
-    {
-        throw "Invalid syntax.";
-    }
-    
-    
+	std::string build;
+
+	if (infixeq[0] != '(') // if the first part of the expression isn't a open parentheses 
+		operators.push('(');
+
+	for (int i = 0; i < infixeq.length(); ++i)
+	{
+		if (infixeq[i] >= 0 && infixeq[i] > 9)
+			operand.push(infixeq[i]);
+
+		else if (isOperator(infixeq[i]))
+		{
+			while (priority(infixeq[i]) <= priority(operators.peek()))
+			{
+				build += infixeq[i];
+				operators.pop();
+			}
+			operators.push(infixeq[i]);
+		}
+
+		else if (infixeq[i] == '(')
+			operators.push(infixeq[i]);
+
+		else if (infixeq[i] == ')')
+		{
+			while (operators.peek() != '(')
+				operators.pop();
+
+
+			if (infixeq[i] == '(')
+				operators.pop();
+		}
+	}
+
+	while (operators.peek() != '(')
+	{
+		operators.pop();
+	}
+	postfixeq = build;
 }
 
-/** validates the expression syntax and pushes operators/operands to member stacks
- @pre expressionInfix validation
- @post tokenize string and push operators/operands to appropriate stacks
- @return error message. or true if valid
- */
-bool Calculator::validate(const std::string &inputExpression)
+void Calculator::post2Pre()
 {
-    Tokenizer input(inputExpression);
-    Queue<std::string> tokenQueue;
-    
-    std::string token;
-    int i = 0;
-    int operands =0;
-    int operators = 0;
-    int openParen = 0;
-    int closedParen = 0;
-    
-    // returns a queue of tokenized string
-    tokenQueue = input.split();
-    
-    // must test
-    // 1. series cant end with operator
-    
-    token = tokenQueue.peek();
-    
-    // checks to make sure first entry in input isnt an operator
-    if(isOperator(token[0]))
-    {
-        throw "Invalid Input: " + inputExpression;
-    }
-    
-    // loop through each element of the queue and determine if operator or operand while not empty
-    while( !tokenQueue.isEmpty() )
-    {
-        operators = 0;
-        operands =  0;
-        
-        token = tokenQueue.peek(); // test to ensure correct value is returned after peek!!!!!!!
-        
-        // check if token is valid and if so push to appropriate stack
-        while(token[i])
-        {
-            // check if token is an operand
-            if(token[i] >= '0' && token[i] <= '9')
-            {
-                operands++;
-            }
-            // check if token has an operator
-            else if (isOperator(token[i]))
-            {
-                if(token[i] == '(')
-                {
-                    openParen++;
-                }
-                if(token[i] == ')')
-                {
-                    closedParen++;
-                }
-                
-                operators++;
-            }
-            else
-            {
-                throw "Invalid Input: " + inputExpression;
-            }
-            
-            i++;
-        }
-        // test to ensure token does not contain operator and operand i.e appropriate spacing has been used
-        if(operators > 0 && operands > 0)
-        {
-            throw "Invalid Input: " + inputExpression;
-        }
-        else if(openParen != closedParen)
-        {
-            throw "Invalid Input: " + inputExpression;
-        }
-        else if (operands > 0)
-        {
-            operandStack.push(stoi(token));
-        }
-        //token cant have multiple operators
-        else if(operators > 1)
-        {
-            throw "Invalid Input: " + inputExpression;
-        }
-        else
-        {
-            // if valid operand then there will only be one member of the character token array
-            operatorStack.push(token[0]);
-        }
-        
-        // deque this token from the queue of tokens
-        tokenQueue.dequeue();
-    }
-    
-    // if no exception has been thrown then input is valid
-    return true;
+	std::string build;
+	
+	for (int i = 0; i < postfixeq.length(); ++i)
+	{
+		if (isOperator(postfixeq[i]))
+		{
+			build += postfixeq[i];
+			operators.pop();
+		}
+		else if (postfixeq[i] >= 0 && postfixeq[i] <= 9)
+		{
+			build += postfixeq[i];
+			operand.pop();
+		}
+		else
+		{
+			std::cout << "There is not a valid postfix equation" << std::endl;
+			break;
+		}
+	}
+
 }
 
-/** returns the precedence "weight" for an operator
- @pre None.
- @post None.
- @param op the operator
- @return Weight of the operator and -1 if not found
- */
-int Calculator::precedence(std::string op)
+int Calculator::priority(char oper)
 {
-    int weight = -1;
-    if (op == "+") weight = 1;
-    else if (op == "-") weight = 1;
-    else if (op == "*") weight = 2;
-    else if (op == "/") weight = 2;
-    else if (op == "%") weight = 2;
-    else if (op == "$") weight = 3;
-    else if (op == "^") weight = 3;
-    return weight;
+	if (oper == '*' || oper == '/' || oper == '%')
+		return 2;
+	else if (oper == '+' || oper == '-')
+		return 1;
+	else
+		return -1;
 }
 
-/** check if character is an operator
- @pre None.
- @post None.
- @param op the operator to test
- @return true if is defined operator, false if not defined operator
- */
-bool Calculator::isOperator(char op)
+bool Calculator::isOperator(char x)
 {
-    if (op == '-' || op == '+' || op == '/' || op == '%' || op == '/' || op == '(' || op == ')')
-    {
-        return true;
-    }
-    return false;
+	// 6. You should allow all binary arithmetic operators (+, -, *, /, %) and the parentheses.
+	if (x == '+' || x == '-' || x == '/' || x == '*' || x == '%' || x == '(' || x == ')')
+		return true;
+	else
+		return false;
 }
