@@ -60,7 +60,7 @@ public:
     
    
     int calculate(const std::string& inputExpression);
-    int precedence(std:: string operators);
+    int precedence(char op);
     bool validate(const std::string& inputExpression);
     bool isOperator(char op);
     

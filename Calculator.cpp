@@ -16,10 +16,6 @@ int Calculator::calculate(const std::string &inputExpression)
         //set infix expression to input after validation checking
         infixExp = inputExpression;
         
-        // clear previous result of postfix expression
-        postfixExp = "";
-        
-        
         return result;
     }
     else
@@ -42,10 +38,12 @@ bool Calculator::validate(const std::string &inputExpression)
     
     std::string token;
     int i = 0;
+    int j = 0;
     int operands =0;
     int operators = 0;
     int openParen = 0;
     int closedParen = 0;
+    char x;
     
     // returns a queue of tokenized string
     tokenQueue = input.split();
@@ -66,11 +64,13 @@ bool Calculator::validate(const std::string &inputExpression)
     {
         operators = 0;
         operands =  0;
+        i = 0;
+        j = 0;
         
         token = tokenQueue.peek(); // test to ensure correct value is returned after peek!!!!!!!
         
         // check if token is valid and if so push to appropriate stack
-        while(token[i])
+        while(token[i] != '\0') //null terminator?!!!!!!
         {
             // check if token is an operand
             if(token[i] >= '0' && token[i] <= '9')
@@ -107,25 +107,72 @@ bool Calculator::validate(const std::string &inputExpression)
         {
             throw "Invalid Input: " + inputExpression;
         }
-        else if (operands > 0)
-        {
-            operandStack.push(stoi(token));
-        }
         //token cant have multiple operators
         else if(operators > 1)
         {
             throw "Invalid Input: " + inputExpression;
         }
+        if (operands > 0)
+        {
+            operandStack.push(stoi(token));
+        }
         else
         {
-            // if valid operand then there will only be one member of the character token array
-            operatorStack.push(token[0]);
+            if(token[0] == '(')
+            {
+                operatorStack.push(token[0]);
+            }
+            else if( isdigit(token[0]) || isalpha(token[0]))
+            {
+                postfixExp[j] = token[0];              /* add operand symbol to postfix expr */
+                j++;
+            }
+            else if(token[0] == '*' || token[0] == '/' ||token[0] == '+'
+                    || token[0] =='-' || token[0] =='%')        /* means symbol is operator */
+            {
+                x = operatorStack.peek();
+                operatorStack.pop();
+                
+                while(isOperator(x) == 1 && precedence(x)>= precedence(token[0]))
+                {
+                    postfixExp[j] = x;                  /* so pop all higher precendence operator and */
+                    j++;
+                    x = operatorStack.peek();
+                    operatorStack.pop();                    /* add them to postfix expresion */
+                }
+                operatorStack.push(x);
+                /* because just above while loop will terminate we have
+                 oppped one extra item
+                 for which condition fails and loop terminates, so that one*/
+                
+                operatorStack.push(token[0]);                 /* push current oprerator symbol onto stack */
+            }
+            else if(token[0] == ')')         /* if current symbol is ')' then */
+            {
+                x = operatorStack.peek();
+                operatorStack.pop();                  /* pop and keep popping until */
+               
+                while(x != '(')                /* '(' encounterd */
+                {
+                    postfixExp[j] = x;
+                    j++;
+                    x = operatorStack.peek();
+                    operatorStack.pop();
+                }
+            }
+           
+            i++;
+            
+         /* while loop ends here */
+    
+            postfixExp[j] = '\0'; /* add sentinel else puts() fucntion */
+            /* will print entire postfix[] array upto SIZE */
+            
         }
         
         // deque this token from the queue of tokens
         tokenQueue.dequeue();
     }
-    
     // if no exception has been thrown then input is valid
     return true;
 }
@@ -136,17 +183,16 @@ bool Calculator::validate(const std::string &inputExpression)
  @param op the operator
  @return Weight of the operator and -1 if not found
  */
-int Calculator::precedence(std::string op)
+int Calculator::precedence(char op)
 {
-    int weight = -1;
-    if (op == "+") weight = 1;
-    else if (op == "-") weight = 1;
-    else if (op == "*") weight = 2;
-    else if (op == "/") weight = 2;
-    else if (op == "%") weight = 2;
-    else if (op == "$") weight = 3;
-    else if (op == "^") weight = 3;
-    return weight;
+    if(op == '^')
+        return 3;
+    else if(op == '*' || op == '/')
+        return 2;
+    else if(op == '+' || op == '-')
+        return 1;
+    else
+        return -1;
 }
 
 /** check if character is an operator
@@ -163,3 +209,43 @@ bool Calculator::isOperator(char op)
     }
     return false;
 }
+
+/** converts expressionInfixQ Queue to expressionPostQ Queue
+ @pre expressionInfixQ checks
+ @post expressionPostQ is populated
+ @param None
+ @return expressionPostQ as a string */
+std::string Calculator::infixToPostfix()
+{
+    return "";
+}
+
+/*
+ // if valid operand then there will only be one member of the character token array.
+ // If the precedence of the scanned operator is greater than the precedence of the operator
+ // in the stack(or the stack is empty or the stack contains a ‘(‘ ), push it.
+ if(operatorStack.isEmpty())
+ {
+ operatorStack.push(token[0]);
+ }
+ else if(operatorStack.peek() == '(')
+ {
+ operatorStack.push(token[0]);
+ }
+ else if(precedence(token[0]) > precedence(operatorStack.peek()))
+ {
+ operatorStack.push(token[0]);
+ }
+ else
+ {
+ while(!operatorStack.isEmpty())
+ {
+ if(precedence(operatorStack.peek()) >= precedence(token[0])
+ && (operatorStack.peek() != '(' ||operatorStack.peek() != ')' ))
+ {
+ operatorStack.pop();
+ }
+ }
+ operatorStack.push(token[0]);
+ }
+ */
