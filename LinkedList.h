@@ -17,7 +17,8 @@ private:
     
 protected:
     // list head pointer
-    LinkNode<T> *head; // i want this to be protected
+    LinkNode<T> *head;
+    LinkNode<T> *tail;
     int test = 0;
     
 public:
@@ -36,18 +37,21 @@ public:
     void addData(T data);
     void emptyList();
     void insertOrdered(T data, int index);
+    T getData(int index);
     
     // tests if ascending/descending/unsorted
     int getSort();
     int getCount();
+    LinkNode<T>* getTail();
     
     T getFirstData();
+    T getLastData();
 };
 
 
-//******************************************************
-//              TEMPLATE Class Linked List DEFINITIONS
-//******************************************************
+//******************************************************//
+//        Linked List TEMPLATE Class DEFINITIONS        //
+//******************************************************//
 
 
 //******************************************************
@@ -234,7 +238,7 @@ void LinkedList<T>::insertOrdered(T value, int index)
 }
 
 //******************************************************
-//
+// Deletion function
 //******************************************************
 
 // pre: index - integer type
@@ -372,6 +376,15 @@ int LinkedList<T>::getSort()
 }
 
 //******************************************************
+// post: Return tail pointer
+//******************************************************
+template <class T>
+LinkNode<T>* LinkedList<T>::getTail ()
+{
+    return tail;
+}
+
+//******************************************************
 // post: Empty all linked list contents and deallocates memory
 //******************************************************
 template <typename T>
@@ -426,4 +439,35 @@ T LinkedList<T>::getFirstData()
     return head->getNext()->getData();
 }
 
+
+// get head data
+template <typename T>
+T LinkedList<T>::getLastData()
+{
+    return getData(count-1);
+}
+
+// get data at index
+template <typename T>
+T LinkedList<T>::getData(int index)
+{
+    
+    int indexCount = 0;
+    
+    LinkNode<T>* prePtr;
+    LinkNode<T>* currPtr;
+    
+    prePtr = head;
+    currPtr = head->getNext();
+    
+    // currPtr pointing at data data member from LinkNode class
+    while (currPtr != nullptr && indexCount < index)
+    {
+        prePtr = currPtr;
+        currPtr = currPtr->getNext();
+        indexCount++;
+    }
+
+    return currPtr->getData();
+}
 #endif
