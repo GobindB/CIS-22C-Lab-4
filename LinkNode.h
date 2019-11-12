@@ -1,61 +1,83 @@
-#ifndef LINKNODE_H
-#define LINKNODE_H
+#ifndef LinkNode_h
+#define LinkNode_h
 
-#include <iostream>
-//******************************************************//
-// Template Link Node Class
-//******************************************************//
 template <typename T>
 class LinkNode
 {
 private:
-    
-    LinkNode<T> *next;
-    T data;
-    
+	//ADT data
+	T data;
+	//pointer to next node
+	LinkNode *next;
 public:
-    LinkNode();
-    LinkNode<T>* getNext();
-    T getData();
-    void setNext(LinkNode<T> * next);
-    void setData(T value);
+	//construtor
+	LinkNode();
+	//setter for data
+	void setData(T);
+	//getter for a data
+	T& getData();
+	//setter for pointer to a next node
+	void setNext(LinkNode *node);
+	//getter for a pointer to a next node
+	LinkNode *getNext() const;
+
 };
 
-//******************************************************//
-// Template Link Node Class Definition
-//******************************************************//
 
-// LinkNode default constructor
-// assigns  data member to constructor data value
-// post: initializes next pointer to nullptr
+/*Constructor for LinkNode. Sets next to null
+Pre:
+Post: next - set to null
+Return:
+*/
 template <typename T>
 LinkNode<T>::LinkNode()
+	: next(nullptr)
 {
-    next = nullptr;
 }
 
+
+/*
+Pre:dataArg - data to set in a node
+Post: assign given data to a node
+Return:
+*/
 template <typename T>
-LinkNode<T>* LinkNode<T>::getNext()
+void LinkNode<T>::setData(T dataArg)
 {
-    return next;
+	data = dataArg;
 }
 
+/*
+Pre:
+Post:
+Return: data in a node
+*/
 template <typename T>
-T LinkNode<T>::getData()
+T& LinkNode<T>::getData()
 {
-    return data;
+	return data;
 }
 
+/*
+Pre: node - address of a next node
+post: assign th egiven address to a next pointer
+Return:
+*/
 template <typename T>
-void LinkNode<T>::setNext(LinkNode<T> * value)
+void LinkNode<T>::setNext(LinkNode *node)
 {
-    next = value;
+	next = node;
 }
 
+/*
+Pre:
+Post:
+Return: return pointer
+*/
 template <typename T>
-void LinkNode<T>::setData(T value)
+LinkNode<T> *LinkNode<T>::getNext() const
 {
-    data = value;
+	return next;
 }
 
-#endif // !LINKNODE_H
+#endif /* LinkNode_h */
