@@ -11,16 +11,17 @@
 #include "LinkedList.h"
 
 template <class T>
-class Queue : public LinkedList<T>
+class Queue : protected LinkedList<T>
 {
-private:
     
 public:
+    
     Queue();
     void enqueue(T data);
     void dequeue();
     void clear();
     
+    // data at front of queue
     T peek();
     
     bool isEmpty();

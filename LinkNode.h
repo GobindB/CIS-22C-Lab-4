@@ -47,7 +47,7 @@ T LinkNode<T>::getData()
 }
 
 template <typename T>
-void LinkNode<T>::setNext(LinkNode<T> * value)
+void LinkNode<T>::setNext(LinkNode<T> *value)
 {
     next = value;
 }

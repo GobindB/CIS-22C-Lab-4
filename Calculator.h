@@ -9,72 +9,52 @@
 #ifndef Calculator_h
 #define Calculator_h
 
-#include <stdio.h>
+#include <string>
 #include "Stack.h"
 #include "Queue.h"
-#include "Tokenizer.h"
-
-// use the two stack method as shown in class
-
-// 1. change the infix expression to post-fix expression.
-// 2. output the post fix expression as well as its result
-// 3. verify result by repeating process with converting to pre-fix expression
-// 4. output pre-fix expression and result
-//
-// 5. assume operands in input will be any size integer operands but succesive operands/operators are
-//    seperated by spaces (perform appropriate validation) infrom user if malformed
-//    unary operators are illegal
-//
-// 6. all binary arithmetic operators (+,-,*,/,%) and parentheses
-
-
 
 class Calculator
 {
     
 private:
     
-    //stack of operands
-    Stack<int> operandStack;
+    std::string infixExp = "";
+    std::string postfixExp = "";
+    std::string prefixExp = "";
+    int resultPost;
+    int resultPre;
+
+protected:
     
-    // stack of operatos
-    Stack<char> operatorStack;
+    bool validate(std::string inputExpression);
+   
+    bool isOperator(std::string op);
+    bool isParen(std::string op);
+    bool isOperand(std::string C);
     
-    // most recent input expression
-    std::string infixExp;
+    int precedence(char op);
+    int performOperation(char operation, int operand1, int operand2);
+    int higherPrecedence(char op1, char op2);
     
-    // most recent expression expressed in post-fix form
-    std::string postfixExp;
+    void infixToPostfix(std::string infix);
+    void infixToPrefix(std::string infix);
+    void evaluatePre();
     
-    // most recent expression in pre-fix form
-    std::string prefixExp;
-    
-    // result of evaluated expression
-    int result;
-    
-    void evaluate();
-    
-    
-    
+    void reverse(Queue<std::string> &aQueue);
+    void tokenize(std::string, Queue<std::string> &aQ);
+
 public:
     
    
-    int calculate(const std::string& inputExpression);
-    int precedence(std:: string operators);
-    bool validate(const std::string& inputExpression);
-    bool isOperator(char op);
-    
-    //setters
-    void setInfix(std::string input);
-    
+    void calculatePost(const std::string& inputExpression);
+    void calculatePre(const std::string &inputExpression);
+ 
     //getters
-    int getResult() const;
+    int getResultPost() const;
+    int getResultPre() const;
     std::string getInfix() const;
     std::string getPostfix() const;
     std::string getPrefix() const;
-    
-    
-    std::string infixToPostfix();
-    
+    std::string trim(const std::string &s);
 };
 #endif /* Calculator_h */
