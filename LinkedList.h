@@ -1,469 +1,473 @@
-#ifndef LinkedList_h
-#define LinkedList_h
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
 
 #include "LinkNode.h"
 #include <iostream>
-#include <string>
-//=====================================================================================
-// Linked List
-//=====================================================================================
+
+//******************************************************//
+// Template Linked List Class
+//******************************************************//
+
 template <typename T>
 class LinkedList
 {
 private:
-	LinkNode<T> *head;
-	LinkNode<T> *tail;
-	int count;
-	int sort; //0:unsorted 1:ascending 2:descending
-
+    int sort = 0; // 0 = unsorted, 1 = ascending, 2 = descending
+    int count = 0;
+    
+protected:
+    // list head pointer
+    LinkNode<T> *head;
+    LinkNode<T> *tail;
+    int test = 0;
+    
 public:
-	LinkedList(int = 0);
-	virtual ~LinkedList();
-
-	int getSort() const;//getter for a sorting type of a list
-	int getCount() const;//getter for a count
-	void emptyList();//clear out all nodes in a list
-
-	void print() const;// prints out list
-
-	void addData(T); // create new node and add it to a list
-	int addData(T, int);// create new node and add it to a list to a given location
-
-	bool eliminateData(T);// delete all nodes which has the data given
-	bool deleteData(T);//deletes one node of delData value
-
-	int findData(T);//find a node that has given data
-	bool isEmpty();//check if its empty
-
-	T& getDataList(int);
-
-	void setTail(); //already efficiently incorporated in the add and delete functions so this function exists only for potential future use
-	T& getTail();
-
+    
+    LinkedList();
+    LinkedList(int type);
+    // deletes the linked list
+    virtual ~LinkedList();
+    
+    bool deleteData(T data);
+    bool findData(T data);
+    bool deleteNode(int index);
+    bool isEmpty(); // DEFINE
+    
+    void print() const;
+    void addData(T data);
+    void emptyList();
+    void insertOrdered(T data, int index);
+    T getData(int index);
+    
+    // tests if ascending/descending/unsorted
+    int getSort();
+    int getCount();
+    LinkNode<T>* getTail();
+    
+    T getFirstData();
+    T getLastData();
 };
 
 
-/*Constructor for the LinkedList. Sets count to 0. Creates the head and makes it point to nullptr.
-Pre: sortType - integer which determines if the data will be sorted or unsorted
-Post: modifies the head next
-Return:
-*/
-template <typename T>
-LinkedList<T>::LinkedList(int sortType)
-	: count(0) //initialize count to 0
-{
-	head = new LinkNode<T>;
-	head->setNext(nullptr);
-	tail = nullptr;
+//******************************************************//
+//        Linked List TEMPLATE Class DEFINITIONS        //
+//******************************************************//
 
-	if (sortType < 0 || sortType > 2) //if sortType is neither 0, 1, or  2, set it to 0: unsorted
-		sortType = 0;
-	sort = sortType;
+
+//******************************************************
+// LinkedList constructors and Destructors
+//******************************************************
+template <typename T>
+LinkedList<T>::LinkedList()
+{
+    sort = 0;
+    count = 0;
+    
+    // dummy node
+    head = new LinkNode<T>();
+}
+// pre: type - integer
+// post: initializes counter to 0
+//         assign sort to type to determine sort type
+//         creates space for head node (sentinal node)
+template <typename T>
+LinkedList<T>::LinkedList(int type) : count(0)
+{
+    // assign type
+    if (type < 0 || type > 2)
+    {
+        sort = type;
+    }
+    else
+    {
+        sort = type;
+    }
+    
+    // dummy node
+    head = new LinkNode<T>();
 }
 
-
-/* Destructor deletes all the nodes and the head. Frees memory
-Pre:
-Post: deltes everything.
-Return:
-*/
+// Linked List destructor
+// post: deletes the linked list
 template <typename T>
 LinkedList<T>::~LinkedList()
 {
-	LinkNode<T> *currPtr;
-	LinkNode<T> *nextPtr;
-	currPtr = head->getNext();
-
-	while (currPtr != nullptr)
-	{
-		nextPtr = currPtr->getNext();
-		delete currPtr;
-		currPtr = nextPtr;
-	}
-
-	delete head;
+    LinkNode<T>* currPtr;
+    LinkNode<T>* nextPtr;
+    
+    currPtr = head->getNext();
+    
+    
+    while (currPtr != nullptr)
+    {
+        nextPtr = currPtr->getNext();
+        delete currPtr;
+        currPtr = nextPtr;
+    }
+    
+    delete head;
 }
 
+//******************************************************
+// Insert/Append functions
+//******************************************************
 
-/* prints the output of the array.
-Pre:
-Post:
-Return:
-*/
+// pre: data - template typename variable
+// post: adds new nodes to linked list
+//       increments count
 template <typename T>
-void LinkedList<T>::print() const
+void LinkedList<T>::addData(T data)
 {
-	LinkNode<T> *currPtr;
-	currPtr = head->getNext();
-
-	while (currPtr != nullptr)
-	{
-		std::cout << currPtr->getData() << " ";
-		currPtr = currPtr->getNext();
-	}
-	std::cout << std::endl;
+    //pointer to new node
+    LinkNode<T> *newNode;
+    // node to traverse the list
+    LinkNode<T> *currPtr;
+    LinkNode<T>* prePtr = nullptr;
+    
+    newNode = new LinkNode<T>();
+    newNode->setData(data);
+    
+    
+    switch (sort)
+    {
+        case 0:
+            
+            currPtr = head;
+            while (currPtr->getNext())
+                currPtr = currPtr->getNext();
+            
+            currPtr->setNext(newNode);
+            
+            count++;
+            break;
+            
+            //ascending
+        case 1:
+            prePtr = head;
+            currPtr = head->getNext();
+            // currPtr pointing at data data member from LinkNode class
+            while (currPtr != nullptr && currPtr->getData() < data)
+            {
+                prePtr = currPtr;
+                currPtr = currPtr->getNext();
+            }
+            if (prePtr == nullptr)
+            {
+                head = newNode;
+                newNode->setNext(currPtr);
+            }
+            else
+            {
+                prePtr->setNext(newNode);
+                newNode->getNext(currPtr);
+            }
+            
+            count++;
+            break;
+            
+            // descending
+        case 2:
+            
+            prePtr = head;
+            currPtr = head->getNext();
+            
+            // currPtr pointing at data data member from LinkNode class
+            while (currPtr != nullptr && currPtr->getData() > data)
+            {
+                prePtr = currPtr;
+                currPtr = currPtr->getNext();
+            }
+            if (prePtr == nullptr)
+            {
+                head = newNode;
+                newNode->setNext(currPtr);
+            }
+            else
+            {
+                prePtr->setNext(newNode);
+                newNode->getNext(currPtr);
+            }
+            
+            count++;
+            break;
+            
+        default:
+            break;
+    }
 }
 
-
-/* prints the output of the array. Overloaded for Rupee type. Rupee type works with standard print, but this cleans the output a bit by adding endl
-Pre:
-Post:
-Return:
-*/
-//template <> //overloaded function adds an endline when outputting the Rupee data
-//void LinkedList<Rupee>::print() const
-//{
-//    LinkNode<Rupee> *currPtr;
-//    currPtr = head->getNext();
-//
-//    while (currPtr != nullptr)
-//    {
-//        std::cout << currPtr->getData() << std::endl;
-//        currPtr = currPtr->getNext();
-//    }
-//    std::cout << std::endl;
-//}
-
-
-
-/* Adds data to the link list. Creates a new node.
-Pre: newData - type T. template type
-Post:
-Return:
-*/
+// pre: value - template typename variable
+//        index - integer type
+// post: adds node to specific spot(index) in unsorted linked list
+//         increments count
 template <typename T>
-void LinkedList<T>::addData(T newData)
+void LinkedList<T>::insertOrdered(T value, int index)
 {
-	LinkNode<T> *newNode = new LinkNode<T>;
-	newNode->setData(newData);
-	LinkNode<T> *currPtr;
-	LinkNode<T> *prePtr;
+    int indexCount = 0;
+    
+    LinkNode<T>* newNode = new LinkNode<T>();
+    LinkNode<T>* prePtr;
+    LinkNode<T>* currPtr;
+    
+    
+    prePtr = head;
+    currPtr = head->getNext();
+    
+    // currPtr pointing at data data member from LinkNode class
+    while (currPtr != nullptr && indexCount < index)
+    {
+        prePtr = currPtr;
+        currPtr = currPtr->getNext();
+        indexCount++;
+    }
+    if (prePtr == nullptr)
+    {
+        head = newNode;
+        newNode->setNext(currPtr);
+        newNode->setData(value);
+    }
+    else
+    {
+        prePtr->setNext(newNode);
+        newNode->setNext(currPtr);
+        newNode->setData(value);
+    }
+    
+    
+    count++;
+}
 
-	prePtr = head;
-	currPtr = head->getNext();
+//******************************************************
+// Deletion function
+//******************************************************
 
-
-	switch (sort)
-	{
-	case 0: //if unsorted
-	{
-		while (currPtr != nullptr) //goes to end of the list
-		{
-			prePtr = currPtr;
-			currPtr = currPtr->getNext();
-		}
-		break;
-	}
-	case 1: //ascending order
-	{
-		while (currPtr != nullptr && newNode->getData() > currPtr->getData()) //newNode will be between smaller and larger value
-		{
-			prePtr = currPtr;
-			currPtr = currPtr->getNext();
-		}
-		break;
-	}
-	case 2: //descending order
-	{
-		while (currPtr != nullptr && newNode->getData() < currPtr->getData()) //newNode will be between larger and smaller value
-		{
-			prePtr = currPtr;
-			currPtr = currPtr->getNext();
-		}
-		break;
-	}
-	default:
-		break;
-	}
-
-	prePtr->setNext(newNode);
-	newNode->setNext(currPtr);
-	++count; //increment the count
-
-
-	if (newNode->getNext() == nullptr)
-		tail = newNode;
-	//setTail(); not needed but may be useful later
+// pre: index - integer type
+// post: Deletes node at a particular index point in unsorted linked list
+//         decrements count
+// return: value of node
+template<typename T>
+bool LinkedList<T>::deleteNode(int index)
+{
+    if (count == 0)
+    {
+        return false;
+    }
+    
+    int indexCount = 0;
+    
+    LinkNode<T>* prePtr;
+    LinkNode<T>* currPtr;
+    
+    prePtr = head;
+    currPtr = head->getNext();
+    
+    // currPtr pointing at data data member from LinkNode class
+    while (currPtr != nullptr && indexCount < index)
+    {
+        prePtr = currPtr;
+        currPtr = currPtr->getNext();
+        indexCount++;
+    }
+    
+    
+    if (currPtr != nullptr)
+    {
+        prePtr->setNext(currPtr->getNext());
+        delete currPtr;
+    }
+    
+    count--;
+    return true;
 }
 
 
-
-/* adds data to unsorted list by position. Returns -1 if the list is sorted because this operation would not be allowed.
-Pre: newData - T data
-position - int index of newNode
-Post:
-Return: int - position. returns -1 if this operation fails.
-*/
+//******************************************************
+// pre: value - template class type
+// post: Delete all instances of a particular value from the LinkedList
+// return: true or false
+//******************************************************
 template <typename T>
-int LinkedList<T>::addData(T newData, int position)
+bool LinkedList<T>::deleteData(T value)
 {
-	if (sort != 0) //if sort type is not unsorted
-		return -1;
-	else if (position < 0 || position > count) //if position out of bounds
-	{
-		return -1;
-	}
-
-	LinkNode<T> *newNode;
-	newNode = new LinkNode<T>;
-	newNode->setData(newData);
-
-
-	LinkNode<T> *currPtr;
-	LinkNode<T> *prePtr;
-
-	prePtr = head;
-	currPtr = head->getNext();
-
-
-	int index = 0;
-	while (currPtr != nullptr && index < position) //goes to index
-	{
-		prePtr = currPtr;
-		currPtr = currPtr->getNext();
-
-		++index;
-	} //currPtr is now on index position
-	prePtr->setNext(newNode);
-	newNode->setNext(currPtr); //inserted behind index position, becomes the new index position
-
-	++count;
-
-	if (newNode->getNext() == nullptr)
-		tail = newNode;
-	//setTail(); //not needed but may be useful later
-	return position;
+    bool deleted = false;
+    if (count == 0)
+    {
+        return false;
+    }
+    
+    LinkNode<T>* prePtr;
+    LinkNode<T>* currPtr;
+    LinkNode<T>* nextPtr;
+    
+    prePtr = head;
+    currPtr = head->getNext();
+    
+    while (currPtr->getNext())
+    {
+        nextPtr = currPtr->getNext();
+        
+        if (currPtr->getData() == value)
+        {
+            prePtr->getNext() = nextPtr;
+            delete currPtr;
+            --count;
+            deleted = true;
+        }
+        else
+        {
+            prePtr = prePtr->getNext();
+        }
+        currPtr = nextPtr;
+        
+    }
+    return deleted;
 }
 
-
-
-/* deletes all values of delData from the linked list
-Pre: delData - T data to be deleted
-Post:
-Return: true or false. false if the data is not in the linked list
-*/
+//******************************************************
+// pre: value - template class type
+// post: See if data value exists in linked list
+// return: true or false
+//******************************************************
 template <typename T>
-bool LinkedList<T>::eliminateData(T delData)
+bool LinkedList<T>::findData(T value)
 {
-	bool eliminated = false;
-
-	LinkNode<T> *currPtr;
-	LinkNode<T> *prePtr;
-	LinkNode<T> *nextPtr = nullptr;
-
-	prePtr = head;
-	currPtr = head->getNext();
-
-	while (currPtr != nullptr)
-	{
-		nextPtr = currPtr->getNext();
-
-		if (currPtr->getData() == delData)
-		{
-			prePtr->setNext(nextPtr);
-			delete currPtr; //currPtr got deleted, so prePtr won't move up or else they will
-			--count;        // be on the same node.
-			eliminated = true;
-		}
-		else
-		{
-			prePtr = prePtr->getNext(); //only moves if currPtr didn't get deleted
-		}
-		currPtr = nextPtr;
-	}
-
-	tail = prePtr; // prePtr points to last node
-				   //setTail not needed here
-
-	return eliminated;
+    LinkNode<T>* prePtr;
+    LinkNode<T>* currPtr;
+    
+    prePtr = head;
+    currPtr = head->getNext();
+    
+    // currPtr pointing at data data member from LinkNode class
+    while (currPtr != nullptr)
+    {
+        if (currPtr->getData() == value)
+        {
+            return true;
+        }
+        else
+        {
+            prePtr = currPtr;
+            currPtr = currPtr->getNext();
+        }
+    }
+    //    if (currPtr != nullptr)
+    //        return false;
+    //    else
+    return false;
 }
 
 
-
-/* deletes one node of delData value
-Pre: delData - T data to be deleted
-Post:
-Return: true or false. false if data not found in list. true otherwise
-*/
+//******************************************************
+// post: Return member variable count
+//******************************************************
 template <typename T>
-bool LinkedList<T>::deleteData(T delData)
+int LinkedList<T>::getCount()
 {
-	bool deleted = false;
-	LinkNode<T> *currPtr;
-	LinkNode<T> *prePtr;
-
-	prePtr = head;
-	currPtr = head->getNext();
-
-	while (currPtr != nullptr && currPtr->getData() != delData)
-	{
-		prePtr = currPtr;
-		currPtr = currPtr->getNext();
-	}
-	if (currPtr != nullptr)
-	{
-		deleted = true;
-		prePtr->setNext(currPtr->getNext());
-		delete currPtr;
-		--count;
-	}
-
-
-	if (!isEmpty() && prePtr->getNext() == nullptr)
-		tail = prePtr;
-
-	return deleted;
+    return count;
 }
 
+//******************************************************
+// post: Return member variable count
+//******************************************************
+template <typename T>
+int LinkedList<T>::getSort()
+{
+    return sort;
+}
 
+//******************************************************
+// post: Return tail pointer
+//******************************************************
+template <class T>
+LinkNode<T>* LinkedList<T>::getTail ()
+{
+    return tail;
+}
 
-/* empies the list out except for the head.
-Pre:
-Post: list is now empty. head points to null
-Return:
-*/
+//******************************************************
+// post: Empty all linked list contents and deallocates memory
+//******************************************************
 template <typename T>
 void LinkedList<T>::emptyList()
 {
-	LinkNode<T> *currPtr = head->getNext();
-	LinkNode<T> *nextPtr;
-
-	while (currPtr != nullptr)
-	{
-		nextPtr = currPtr->getNext();
-		delete currPtr;
-		currPtr = nextPtr;
-		--count;
-	}
-	head->setNext(nullptr);
-
-	tail = nullptr;
+    LinkNode<T>* currPtr;
+    LinkNode<T>* nextPtr;
+    
+    currPtr = head->getNext();
+    
+    while (currPtr != nullptr)
+    {
+        nextPtr = currPtr->getNext();
+        delete currPtr;
+        currPtr = nextPtr;
+    }
+    
+    head->setNext(nullptr);
+    
+    if (currPtr == nullptr)
+    {
+        return;
+    }
 }
 
-
-
-/* looks for data in the linked list.
-Pre: search - T
-Post:
-Return: int - returns the index of the search value node
-*/
+//******************************************************
+// post: displays linked list contents to console
+//******************************************************
 template <typename T>
-int LinkedList<T>::findData(T search)
+void LinkedList<T>::print() const
 {
-	int notFoundIndex = -1;
-	int index = 0;
-
-	LinkNode<T> *currPtr;
-	currPtr = head->getNext();
-
-	while (currPtr != nullptr)
-	{
-		if (currPtr->getData() == search)
-		{
-			return index;
-		}
-		currPtr = currPtr->getNext();
-		++index;
-	}
-	return notFoundIndex;
+    LinkNode<T> *currPtr;
+    
+    currPtr = head->getNext();
+    
+    while (currPtr)
+    {
+        T data = currPtr->getData();
+        // dereference the currPtr to access the node to access the data
+        std::cout << data;
+        std::cout << std::endl;
+        
+        // make currPtr access next node of the list
+        currPtr = currPtr->getNext();
+    }
 }
 
-/*
-Pre:
-Post:
-Return: int - number of nodes in a list
-*/
+// get head data
 template <typename T>
-int LinkedList<T>::getCount() const
+T LinkedList<T>::getFirstData()
 {
-	return count;
+    return head->getNext()->getData();
 }
 
-/*
-Pre:
-Post:
-Return: int - type of order
-*/
+
+// get head data
 template <typename T>
-int LinkedList<T>::getSort() const
+T LinkedList<T>::getLastData()
 {
-	return sort;
+    return getData(count-1);
 }
 
-/*
-Pre:
-Post:
-Return: bool - whether if it is empty
-*/
+// get data at index
 template <typename T>
-bool LinkedList<T>::isEmpty()
+T LinkedList<T>::getData(int index)
 {
-	if (count == 0)
-		return true;
-	else
-		return false;
+    
+    int indexCount = 0;
+    
+    LinkNode<T>* prePtr;
+    LinkNode<T>* currPtr;
+    
+    prePtr = head;
+    currPtr = head->getNext();
+    
+    // currPtr pointing at data data member from LinkNode class
+    while (currPtr != nullptr && indexCount < index)
+    {
+        prePtr = currPtr;
+        currPtr = currPtr->getNext();
+        indexCount++;
+    }
+
+    return currPtr->getData();
 }
-
-
-/* finds the tail of the list. not always needed (more efficient ways implemented in the program)
-Pre:
-Post: sets tail member to the rear of the list
-Return:
-*/
-template <typename T>
-void LinkedList<T>::setTail()
-{
-	LinkNode<T> *currPtr;
-	currPtr = head->getNext();
-
-	while (currPtr->getNext() != nullptr)
-	{
-		currPtr = currPtr->getNext();
-	}
-	tail = currPtr;
-}
-
-
-/* gets the tail
-Pre:
-Post:
-Return: T - the rear of the list. modifiable if needed.
-*/
-template <typename T>
-T& LinkedList<T>::getTail()
-{
-	if (tail != nullptr)
-	{
-		return tail->getData();
-	}
-	else
-		return head->getData();
-}
-
-
-/* gets the data at a certain index
-Pre: index - int of location of data to retrieve
-Post:
-Return: T - the data of the node of the index specified
-*/
-template <typename T>
-T& LinkedList<T>::getDataList(int index)
-{
-	if (index < 0 || index > count - 1) //if position out of bounds
-	{
-		throw "ERROR: LinkedList<T>::getData() INDEX OUT OF BOUNDS!";
-	}
-
-	LinkNode<T> *currPtr;
-	currPtr = head->getNext();
-
-	for (int i = 0; i < index; i++)
-	{
-		currPtr = currPtr->getNext();
-	}
-
-	return currPtr->getData();
-}
-
-
 #endif

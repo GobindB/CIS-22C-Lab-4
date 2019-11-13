@@ -11,9 +11,8 @@
 #include "LinkedList.h"
 
 template <class T>
-class Queue : public LinkedList<T>
+class Queue : protected LinkedList<T>
 {
-private:
     
 public:
     Queue();
