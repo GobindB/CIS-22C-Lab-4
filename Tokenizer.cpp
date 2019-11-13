@@ -55,8 +55,6 @@ void Tokenizer::setDelimiter(const std::string& delimiter)
     this->currPos = buffer.begin();
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // return the next token
 // If cannot find a token anymore, return "".
@@ -78,10 +76,8 @@ std::string Tokenizer::next()
     return token;
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// skip ang leading delimiters
+// skip any leading delimiters
 ///////////////////////////////////////////////////////////////////////////////
 void Tokenizer::skipDelimiter()
 {
