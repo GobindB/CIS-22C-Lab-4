@@ -9,16 +9,16 @@ template <typename T>
 class LinkNode
 {
 private:
-    
-    LinkNode<T> *next;
-    T data;
-    
+
+	LinkNode<T> *next;
+	T data;
+
 public:
-    LinkNode();
-    LinkNode<T>* getNext();
-    T getData();
-    void setNext(LinkNode<T> * next);
-    void setData(T value);
+	LinkNode();
+	LinkNode<T>* getNext();
+	T getData();
+	void setNext(LinkNode<T> * next);
+	void setData(T value);
 };
 
 //******************************************************//
@@ -31,31 +31,37 @@ public:
 template <typename T>
 LinkNode<T>::LinkNode()
 {
-    next = nullptr;
+	next = nullptr;
 }
 
+// return: next pointer
 template <typename T>
 LinkNode<T>* LinkNode<T>::getNext()
 {
-    return next;
+	return next;
 }
 
+// return: data pointer
 template <typename T>
 T LinkNode<T>::getData()
 {
-    return data;
+	return data;
 }
 
+// pre: value - class pointer
+// post: sets next pointer equal to value pointer
 template <typename T>
-void LinkNode<T>::setNext(LinkNode<T> * value)
+void LinkNode<T>::setNext(LinkNode<T> *value)
 {
-    next = value;
+	next = value;
 }
 
+// pre: value - class pointer
+// post: sets data pointer to value pointer
 template <typename T>
 void LinkNode<T>::setData(T value)
 {
-    data = value;
+	data = value;
 }
 
 #endif // !LINKNODE_H
