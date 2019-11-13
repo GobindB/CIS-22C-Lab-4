@@ -15,7 +15,7 @@
 #include "Queue.h"
 
 // default delimiter string (space, tab, newline, carriage return, form feed)
-const std::string DEFAULT_DELIMITER = " \t\v\n\r\f";
+const std::string DEFAULT_DELIMITER = " ";
 
 class Tokenizer
 {
