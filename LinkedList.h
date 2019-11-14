@@ -17,7 +17,8 @@ private:
     
 protected:
     // list head pointer
-    LinkNode<T> *head; // i want this to be protected
+    LinkNode<T> *head;
+    LinkNode<T> *tail;
     int test = 0;
     
 public:
@@ -37,17 +38,21 @@ public:
     void emptyList();
     void insertOrdered(T data, int index);
     
+    T getData(int index);
+    
     // tests if ascending/descending/unsorted
     int getSort();
     int getCount();
+    LinkNode<T>* getTail();
     
     T getFirstData();
+    T getLastData();
 };
 
 
-//******************************************************
-//              TEMPLATE Class Linked List DEFINITIONS
-//******************************************************
+//******************************************************//
+//        Linked List TEMPLATE Class DEFINITIONS        //
+//******************************************************//
 
 
 //******************************************************
@@ -202,12 +207,15 @@ void LinkedList<T>::insertOrdered(T value, int index)
     int indexCount = 0;
     
     LinkNode<T>* newNode = new LinkNode<T>();
+    
     LinkNode<T>* prePtr;
     LinkNode<T>* currPtr;
     
     
     prePtr = head;
     currPtr = head->getNext();
+    
+
     
     // currPtr pointing at data data member from LinkNode class
     while (currPtr != nullptr && indexCount < index)
@@ -216,6 +224,7 @@ void LinkedList<T>::insertOrdered(T value, int index)
         currPtr = currPtr->getNext();
         indexCount++;
     }
+
     if (prePtr == nullptr)
     {
         head = newNode;
@@ -229,12 +238,11 @@ void LinkedList<T>::insertOrdered(T value, int index)
         newNode->setData(value);
     }
     
-    
     count++;
 }
 
 //******************************************************
-//
+// Deletion function
 //******************************************************
 
 // pre: index - integer type
@@ -372,6 +380,15 @@ int LinkedList<T>::getSort()
 }
 
 //******************************************************
+// post: Return tail pointer
+//******************************************************
+template <class T>
+LinkNode<T>* LinkedList<T>::getTail ()
+{
+    return tail;
+}
+
+//******************************************************
 // post: Empty all linked list contents and deallocates memory
 //******************************************************
 template <typename T>
@@ -387,6 +404,7 @@ void LinkedList<T>::emptyList()
         nextPtr = currPtr->getNext();
         delete currPtr;
         currPtr = nextPtr;
+        count--;
     }
     
     head->setNext(nullptr);
@@ -426,4 +444,31 @@ T LinkedList<T>::getFirstData()
     return head->getNext()->getData();
 }
 
+
+// get head data
+template <typename T>
+T LinkedList<T>::getLastData()
+{
+    return getData(count-1);
+}
+
+// get data at index
+template <typename T>
+T LinkedList<T>::getData(int index)
+{
+    if (index < 0 || index > count - 1) //if position out of bounds
+    {
+        throw "ERROR: LinkedList<T>::getData() INDEX OUT OF BOUNDS!";
+    }
+    
+    LinkNode<T> *currPtr;
+    currPtr = head->getNext();
+    
+    for (int i = 0; i < index; i++)
+    {
+        currPtr = currPtr->getNext();
+    }
+
+    return currPtr->getData();
+}
 #endif

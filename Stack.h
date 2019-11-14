@@ -19,6 +19,7 @@ public:
     void pop(); // pop ovverride to only allow top of list
     void push(T data); // push override to only allow top of list
     T peek();
+    T top();
     
     bool isEmpty(); // override to check if empty
     void emptyList();
@@ -34,7 +35,7 @@ Stack<T>::Stack() : LinkedList<T>(0)
 template<class T>
 void Stack<T>::pop()
 {
-    LinkedList<T>::deleteNode(LinkedList<T>::getCount()-1);
+    LinkedList<T>::deleteNode(0);
 };
 
 // adds to top of stack
@@ -77,5 +78,11 @@ void Stack<T>::emptyList()
     LinkedList<T>::emptyList();
 };
 
+// returns value at top of stack
+template<class T>
+T Stack<T>::top()
+{
+   return LinkedList<T>::getLastData();
+};
 #endif /* Stack_h */
 
